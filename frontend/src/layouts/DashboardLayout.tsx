@@ -1,6 +1,6 @@
-import { ReactNode } from 'react';
+﻿import type { ReactNode } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
-import { Code2, LayoutDashboard, FilePlus, LogOut, ShieldCheck } from 'lucide-react';
+import { Code2, LayoutDashboard, FilePlus, LogOut, ShieldCheck, BarChart3 } from 'lucide-react';
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
@@ -16,6 +16,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
   const navItems = [
     { name: 'Dashboard', path: '/dashboard', icon: <LayoutDashboard size={20} /> },
     { name: 'Create Problem', path: '/create-problem', icon: <FilePlus size={20} /> },
+    { name: 'Analytics', path: '/analytics', icon: <BarChart3 size={20} /> },
   ];
 
   return (
@@ -78,8 +79,8 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 
       <main className="flex-1 flex flex-col overflow-hidden">
         <header className="h-16 bg-white border-b border-gray-200 flex items-center px-8 shadow-sm">
-          <h2 className="text-lg font-semibold text-gray-800">
-            {location.pathname === '/dashboard' ? 'Workspace Overview' : 'Problem Authoring'}
+          <h2 className="text-lg font-semibold text-gray-800 capitalize">
+            {location.pathname.replace('/', '').replace('-', ' ') || 'Workspace'}
           </h2>
         </header>
         <div className="flex-1 overflow-auto p-8">

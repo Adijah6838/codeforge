@@ -1,6 +1,4 @@
-﻿version: '3.8'
-
-services:
+﻿services:
   db:
     image: postgres:15-alpine
     container_name: codeforge_db
@@ -12,6 +10,25 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build: ./backend
+    container_name: codeforge_backend
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/codeforge?schema=public
+      - JWT_SECRET=super_secret_codeforge_key_change_in_production
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+
+  frontend:
+    build: ./frontend
+    container_name: codeforge_frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
 
 volumes:
   postgres_data:
