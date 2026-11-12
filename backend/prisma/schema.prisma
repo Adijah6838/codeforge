@@ -31,6 +31,21 @@ enum Difficulty {
   EXPERT
 }
 
+enum Language {
+  CPP
+  PYTHON
+  JAVA
+}
+
+enum VerificationStatus {
+  PENDING
+  ACCEPTED
+  WRONG_ANSWER
+  COMPILATION_ERROR
+  RUNTIME_ERROR
+  TIME_LIMIT_EXCEEDED
+}
+
 model User {
   id        Int      @id @default(autoincrement())
   email     String   @unique
@@ -60,6 +75,7 @@ model Problem {
   testCases      TestCase[]
   versions       ProblemVersion[]
   reviewComments ReviewComment[]
+  solutions      ReferenceSolution[]
   
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
@@ -99,4 +115,19 @@ model ReviewComment {
   
   comment    String   @db.Text
   createdAt  DateTime @default(now())
+}
+
+model ReferenceSolution {
+  id                 Int                @id @default(autoincrement())
+  problemId          Int
+  problem            Problem            @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  
+  language           Language
+  code               String             @db.Text
+  status             VerificationStatus @default(PENDING)
+  executionTime      Float?
+  errorMessage       String?            @db.Text
+  
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
 }
