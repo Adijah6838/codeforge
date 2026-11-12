@@ -7,12 +7,96 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  ADMIN
+  PROBLEM_SETTER
+  SENIOR_REVIEWER
+  TECHNICAL_REVIEWER
+}
+
+enum ProblemStatus {
+  DRAFT
+  SUBMITTED_FOR_REVIEW
+  UNDER_REVIEW
+  CHANGES_REQUESTED
+  APPROVED
+  PUBLISHED
+  ARCHIVED
+}
+
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+  EXPERT
+}
+
 model User {
   id        Int      @id @default(autoincrement())
   email     String   @unique
   name      String
   password  String
-  role      String   @default("PROBLEM_SETTER")
+  role      Role     @default(PROBLEM_SETTER)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  problems        Problem[]
+  reviewComments  ReviewComment[]
+}
+
+model Problem {
+  id          Int           @id @default(autoincrement())
+  title       String
+  description String        @db.Text
+  inputFormat String        @db.Text
+  outputFormat String       @db.Text
+  constraints String        @db.Text
+  difficulty  Difficulty    @default(EASY)
+  status      ProblemStatus @default(DRAFT)
+  
+  authorId    Int
+  author      User          @relation(fields: [authorId], references: [id])
+  
+  testCases      TestCase[]
+  versions       ProblemVersion[]
+  reviewComments ReviewComment[]
+  
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+model TestCase {
+  id        Int      @id @default(autoincrement())
+  problemId Int
+  problem   Problem  @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  
+  input     String   @db.Text
+  output    String   @db.Text
+  isPublic  Boolean  @default(false)
+  
+  createdAt DateTime @default(now())
+}
+
+model ProblemVersion {
+  id        Int      @id @default(autoincrement())
+  problemId Int
+  problem   Problem  @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  
+  title       String
+  description String  @db.Text
+  snapshot    String  @db.Text
+  
+  createdAt DateTime @default(now())
+}
+
+model ReviewComment {
+  id         Int      @id @default(autoincrement())
+  problemId  Int
+  problem    Problem  @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  
+  reviewerId Int
+  reviewer   User     @relation(fields: [reviewerId], references: [id])
+  
+  comment    String   @db.Text
+  createdAt  DateTime @default(now())
 }
